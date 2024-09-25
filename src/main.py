@@ -25,8 +25,11 @@ from playstore.app_validator import AppValidator
 from serviceManager.appium_service_manager import AppiumServiceManager
 from utils.device_utils import Device, adb_connect
 from utils.logging_utils import AppLogger, logger
-from utils.utils import BASE_PORT, CONFIG, PLAYSTORE_MAIN_ACT, PLAYSTORE_PACKAGE_NAME, android_des_caps
+from utils.utils import BASE_PORT, CONFIG, PLAYSTORE_MAIN_ACT, PLAYSTORE_PACKAGE_NAME, android_des_caps, android_options
 from uuid import uuid1
+
+
+
 
 
 IP = ""
@@ -66,13 +69,21 @@ def main():
     PACKAGE = "com.android.chrome"
     ACTIVITY = "com.google.android.apps.chrome.Main"
     try:
+
+        options = android_options(
+            ip,
+            PACKAGE,
+            ACTIVITY
+        )
+        caps = android_des_caps(
+            ip,
+            PACKAGE,
+            ACTIVITY
+        )
+
         driver = webdriver.Remote(
             f"http://localhost:{BASE_PORT}/wd/hub",
-            android_des_caps(
-                ip,
-                PACKAGE,
-                ACTIVITY
-            )
+            caps
         )
         print("Starting to wait")
         driver.implicitly_wait(5)
@@ -87,7 +98,7 @@ def main():
     except Exception as err:
         print("Error in main: ")
         print(err)
-        print( err.with_traceback())
+        # print( err.with_traceback())
 
 
 if __name__ == "__main__":
@@ -96,8 +107,9 @@ if __name__ == "__main__":
         main()
     except Exception as e:
         logging.critical("main crashed")
+        print("Main crashed: ", e)
 
     service_manager = AppiumServiceManager([IP])
     service_manager.cleanup_services()  # Will exit
-    print("Main err: ", e)
+
 

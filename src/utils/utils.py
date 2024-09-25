@@ -14,8 +14,16 @@ from typing import AnyStr, Dict, List, Tuple, Union
 import __main__
 import cv2
 import numpy as np
-from appium.webdriver.appium_service import AppiumService
 
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+
+def nput():
+    a = ""
+    while True:
+        a = input('q to quit')
+        if a == 'q':
+            break
+        a = ''
 
 def users_home_dir():
     return os.path.expanduser( '~' )
@@ -141,10 +149,32 @@ IMAGE_LABELS = [
 
 
 ##      Appium config & stuff  ##
+def android_options(device_name: AnyStr, app_package: AnyStr, main_activity: AnyStr) -> Dict:
+    '''
+        Formats the Desired Capabilities for Appium Server.
+    '''
+
+    options = ChromeOptions()
+    options.platform_name = 'Android'
+    options.set_capability('platformName', 'Android')
+    options.set_capability('appium:udid', device_name)
+    # options.set_capability('appium:appPackage', app_package)
+    options.set_capability('appium:automationName', 'UiAutomator2')
+    options.set_capability('appium:appActivity', main_activity)
+    options.set_capability('appium:ensureWebviewHavepages', "true")
+    options.set_capability('appium:nativeWebScreenshot', "true")
+    options.set_capability('appium:newCommandTimeout', 3600)
+    options.set_capability('appium:connectHardwareKeyboard', "true")
+    options.set_capability('appium:noReset', False)
+    options.set_capability('appium:uiautomator2ServerInstallTimeout', 60000)
+    return options
+
+##      Appium config & stuff  ##
 def android_des_caps(device_name: AnyStr, app_package: AnyStr, main_activity: AnyStr) -> Dict:
     '''
         Formats the Desired Capabilities for Appium Server.
     '''
+
     return {
         'platformName': 'Android',
         'appium:udid': device_name,
@@ -157,9 +187,7 @@ def android_des_caps(device_name: AnyStr, app_package: AnyStr, main_activity: An
         'appium:connectHardwareKeyboard': "true",
         'appium:noReset': False,
         "appium:uiautomator2ServerInstallTimeout": 60000,
-        "chromeOptions": {
-            "args": ["--incognito"]
-        }
+
     }
 
 def dev_scrape_start_at_app(start_package_name: str, app_list: List[List[str]]) -> int:

@@ -74,6 +74,8 @@ class InspectAL:
         self.__driver.switch_to.window(new_window_handle)
         self.__driver.maximize_window()
 
+
+
     def switch_driver_to_main_window(self):
         self.__driver.switch_to.window(self.main_handle)
 
@@ -95,15 +97,6 @@ class InspectAL:
         pyautogui.click()
 
 
-
-
-
-    def __go_to_url(self, url):
-        # using python to Click around, lets click on URL bar
-        self.__click(I_URL_BAR)
-        pyautogui.typewrite(url, 0.100)
-        press(Key.enter)
-        time.sleep(1000)
 
 
     def run(self):

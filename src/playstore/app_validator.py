@@ -1,7 +1,8 @@
 import time
 from typing import List
-from google.cloud import storage
 
+from playstore.lighthouseUI import LighthouseUI
+from utils.utils import nput
 from utils.logging_utils import AppLogger
 
 from utils.app_utils import close_app, open_app
@@ -18,8 +19,7 @@ from dataclasses import dataclass, field
 from playstore.inspector import InspectAL
 
 # Instantiates a client
-storage_client = storage.Client()
-# inspector = InspectAL()
+inspector = InspectAL()
 
 
 
@@ -57,6 +57,7 @@ def safe_find_element(driver, locator, retries=3):
     for attempt in range(retries):
         try:
             # Wait for the element to be located
+            print(f"Looking for {locator=} {attempt=}")
             element = WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located(locator)
             )
@@ -65,6 +66,8 @@ def safe_find_element(driver, locator, retries=3):
             print(f"StaleElementReferenceException caught, retrying... ({attempt + 1}/{retries})")
             if attempt == retries - 1:
                 raise  # Re-raise the exception if we've exhausted all retries
+
+
 
 
 @dataclass(order=True, unsafe_hash=True)
@@ -76,6 +79,8 @@ class AppStats:
 
     def __str__(self):
         return f"{self.app_name};{self.load_time};{self.num_loaded};{self.load_times}"
+
+
 
 class AppValidator:
     ''' Main class to validate a broken app. Discovers, installs, opens and
@@ -90,6 +95,9 @@ class AppValidator:
         self.__app_logger = app_logger
         self.dev_ss_count = 8
         self.__stats: List[AppStats] = []
+        self.__init = True
+        self.__init_check_site = True
+        self.__lh = LighthouseUI()
 
     def __print_stats(self):
 
@@ -101,29 +109,21 @@ class AppValidator:
             print(stat)
         print()
 
-
-    def __newTabButtonExists(self):
-        try:
-            self.__driver.find_element(AppiumBy.ACCESSIBILITY_ID, "New tab")  # May vary based on localization
-            return True
-        except Exception as err:
-            print("New tab DNE")
-        return False
-
     def __closeTabs(self):
-        print("Closing tabs")
+        print(f"Closing tabs: {self.__init_check_site=}")
+
         # The button to access the tab overview can be located by its content description
         try:
             tab_menu = safe_find_element(self.__driver, (AppiumBy.ACCESSIBILITY_ID, "Switch or close tabs"))
             tab_menu.click()
 
-            chrome_menu = self.__driver.find_element(AppiumBy.ACCESSIBILITY_ID, "Customize and control Google Chrome")
+            chrome_menu = safe_find_element(self.__driver, (AppiumBy.ACCESSIBILITY_ID, "Customize and control Google Chrome"))
             chrome_menu.click()
 
-            close_all_item = self.__driver.find_element(AppiumBy.ID, "com.android.chrome:id/close_all_tabs_menu_id")
+            close_all_item = safe_find_element(self.__driver, (AppiumBy.ID, "com.android.chrome:id/close_all_tabs_menu_id"))
             close_all_item.click()
 
-            confirm_btn = self.__driver.find_element(AppiumBy.ID, "com.android.chrome:id/positive_button")
+            confirm_btn = safe_find_element(self.__driver, (AppiumBy.ID, "com.android.chrome:id/positive_button"))
             confirm_btn.click()
 
 
@@ -136,82 +136,53 @@ class AppValidator:
 
     def __check_site(self, url) -> float:
         try:
+            if self.__init_check_site:
+                self.__closeTabs()
+                self.__init_check_site = False
+                # id: com.android.chrome:id/toolbar_action_button
+                home_btn = safe_find_element(self.__driver, (AppiumBy.ACCESSIBILITY_ID, "New tab"))
+                home_btn.click()
+                time.sleep(3)
 
-            # search_bar = self.__driver.find_element(AppiumBy.CLASS_NAME, "android.widget.EditText")
-            # Enter the URL to navigate to and hit enter
+
+            time.sleep(3)
             print("Opening site: ", url)
+            # com.android.chrome:id/url_bar
+            try:
+                url_bar = safe_find_element(self.__driver, (AppiumBy.ID, "com.android.chrome:id/url_bar"))
+                url_bar.click()
+                url_bar.send_keys(url)
+                self.__driver.press_keycode(66)
+            except Exception as err:
+                print("Error entering new url: ", err)
 
-            # search_bar.send_keys(url)
+            print("Opened site: ", url)
+            # nput()
+            time.sleep(5)
 
-            self.__closeTabs()
-            self.__driver.get(url)
-
-            # Get available contexts
-            print(f"{self.__driver.contexts=}")  # This will print a list of contexts like ['NATIVE_APP', 'WEBVIEW_1']
-            WebDriverWait(self.__driver, 20).until(lambda x: 'WEBVIEW_chrome' in self.__driver.contexts)
-            print(f"{self.__driver.contexts=}")
-            # Switch to web context
-            self.__driver.switch_to.context('WEBVIEW_chrome')  # You need to switch to the web context for Chrome
-
-            print("Start timing the page load")
-            start_time = time.time()
-
-            print("self.__driver: ", dir(self.__driver))
-            # No more webview context...
-            # Wait for the page to load (use some element on the page to verify)
-
-            WebDriverWait(self.__driver, 20).until(titleIsReady(get_domain(url)))
-
-            end_time = time.time()
-            print("Stop the timer")
-
-            # Calculate the time taken to load the page
-            load_time = end_time - start_time
-            print(f"Page loaded in {load_time:.2f} seconds")
-
-
-
-
-            # Switch back to native context if needed
-            self.__driver.switch_to.context('NATIVE_APP')
-
-            return load_time
+            return 0
         except Exception as err:
             print("Error checking site: ", err)
 
         return 100
 
-    def __new_tab(self):
-        try:
-            print("Opening new tab")
-            # Thiws button is actually hidden currently, maybe we can change window size, click, maximzie
-            # new_btn_button = self.__driver.find_element(AppiumBy.ACCESSIBILITY_ID, "New tab")  # May vary based on localization
-            # new_btn_button.click()
-            # new_btn_button.click()
-            for _ in range(4):
-                self.__driver.press_keycode(61)  # KEYCODE_TAB
-                time.sleep(0.5)  # Add a small delay between presses
-
-            # Press the Up Arrow key once
-            self.__driver.press_keycode(19)  # KEYCODE_DPAD_UP
-            time.sleep(0.5)
-
-            # Press the Enter key
-            self.__driver.press_keycode(66)  # KEYCODE_ENTER
-            print("new tab clicked")
-            # Press the Tab key 4 times
-        except Exception as err:
-            print("Unable to open new tab: ", err)
-        print("new tab opened")
-
-
     def __inspect_site(self, package_name: str):
         print("Inspecting: ", package_name)
         # Site is open, open inspector
-        # inspector.open_inspector(package_name)
+        if self.__init:
+            inspector.open_inspector(package_name)
+            self.__init = False
 
         # Press reload record....
         # Download data
+        time.sleep(2)
+        # nput()
+        try:
+            self.__lh.start_analysis()
+        except Exception as err:
+            print("err w/ analysis: ", err)
+
+        # nput()
 
         # Close inspector
         # inspector.close_current_window()
@@ -241,8 +212,8 @@ class AppValidator:
         '''
 
         print("\n\n  Navigate to websites and check stuff here: \n\n\n")
-        load_time = self.__check_site(package_name)
-        # self.__inspect_site(package_name)
+        self.__check_site(package_name)
+        self.__inspect_site(package_name)
 
 
 
@@ -273,7 +244,7 @@ class AppValidator:
         # self.__driver.orientation = 'PORTRAIT'
 
         # Load devices before navigating to website
-        # inspector.open_devices()
+        inspector.open_devices()
         print("Done openings device tab...")
 
         app_names = self.__read_apps()

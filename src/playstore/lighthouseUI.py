@@ -8,7 +8,7 @@ import cv2
 import numpy as np
 import pyautogui
 from pynput.keyboard import Controller, Key
-
+from playstore.config import get_save_coords
 
 SCREEN_TOP_MARGIN = 28
 WINDOW_TOP_MARGIN = 35
@@ -57,6 +57,7 @@ class LighthouseUI:
     # This class will Click on the light house download buttons
     __init = True
     keyboard = Controller()
+    __save_coords = get_save_coords()
 
     def __click(self, pt=None):
         if pt is None:
@@ -95,8 +96,7 @@ class LighthouseUI:
         self.__click(pt)
 
     def click_save(self):
-        pt = (2013, 354,)
-        self.__click(pt)
+        self.__click(self.__save_coords)
 
     def click_new_report(self):
         pt = (2280, 95,)

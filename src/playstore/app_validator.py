@@ -98,6 +98,7 @@ class AppValidator:
         self.__init = True
         self.__init_check_site = True
         self.__lh = LighthouseUI()
+        self.__failed_urls = []
 
     def __print_stats(self):
 
@@ -178,9 +179,14 @@ class AppValidator:
         time.sleep(2)
         # nput()
         try:
-            self.__lh.start_analysis()
+            self.__lh.setURL(package_name)
+            success = self.__lh.start_analysis()
+            self.__lh.setURL("")
+            if not success:
+                self.__failed_urls.append(package_name)
         except Exception as err:
             print("err w/ analysis: ", err)
+            self.__failed_urls.append(package_name)
 
         # nput()
 

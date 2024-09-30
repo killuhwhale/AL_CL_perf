@@ -92,13 +92,25 @@ from typing import List
 fp1 = "/home/killuh/Downloads/www.youtube.com-20240924T230012.json"
 fp2 = "/home/killuh/Downloads/www.facebook.com-20240924T225052.json"
 
+ERROR_500 = "Lighthouse was unable to reliably load the page you requested. Make sure you are testing the correct URL and that the server is properly responding to all requests. (Status code: 500)"
+
+ERRORS = [ERROR_500, ]
+
 def get_report(fp):
     r = None
     with open(fp, 'r', encoding='utf-8') as f:
         r = json.load(f)
         print(r.keys())
 
-    return r['audits']['metrics']['details']['items'][0] if r else {}
+
+
+    report = {
+        "error": r['runWarnings'] in ERRORS,
+        "metrics": r['audits']['metrics']['details']['items'][0] if r else {}
+    }
+
+
+    return  report
 
 
 
@@ -106,21 +118,77 @@ chromeOS_report = get_report(fp1)
 AL_OS_report = get_report(fp2)
 
 
+
+
+
+
+def get_file_names(dir):
+    '''
+        Get All report filenames from a DIR and split is they end with _chromeos.json
+    '''
+    fns = []  # TODO() Read all file names from dir
+    chromeos_fns = []
+    al_os_fns = []
+    suffix = "_chromeos.json"
+
+    for fn in fns:
+        if fn[-len(suffix): ] == suffix:
+             chromeos_fns.append(fn)
+        else:
+             al_os_fns.append(fn)
+    return [chromeos_fns, al_os_fns]
+
+
+
+
+
+
 # r1 chromeos, r2 AL OS
 def compare_reports(r1, r2):
+    chromeos_score, al_os_score = 0, 0
     data = collections.defaultdict(List)
-    for key in r1.keys() & r2.keys():
-        data[key] = [r1[key], r2[key]]
+    for key in r1['metrics'].keys() & r2['metrics'].keys():
+        data[key] = [r1['metrics'][key], r2['metrics'][key]]
+
+
+    if r1['error']:
+        print("Error with ChromeOS: ", r1['error'])
+
+    if r2['error']:
+            print("Error with AL OS", r1['error'])
+
+    # TODO()  Update to only compare the 9 keys andupdate each platforms score
+    # chromeos_score += 1 if chromeos_metric < al_os_metric else al_os_score += 1
+    target_keys =  [
+        "firstContentfulPaint",
+        "largestContentfulPaint",
+        "interactive",
+        "speedIndex",
+        "totalBlockingTime",
+        "maxPotentialFID",
+        "cumulativeLayoutShift",
+        "cumulativeLayoutShiftMainFrame",
+        # "lcpLoadStart",
+        # "lcpLoadEnd",
+        "timeToFirstByte",
+    ]
 
     # For each key in data show data in comma separated
-    for key in data:
+    for key in target_keys:
         values = data[key]
-        if key[:-2] == "Ts":
-            print(key, ";", values[0], ";", values[1])
+        if values[0] < values[1]:
+             chromeos_score += 1
         else:
-            print(key, ";", values[0], ";", values[1],  ";", f"{ 'dec' if values[0] > values[1] else 'inc'}", ";", -(values[0] - values[1]) )
+             al_os_score += 1
 
 
+
+        # if key[:-2] == "Ts":
+        #     print(key, ";", values[0], ";", values[1])
+        # else:
+        #     print(key, ";", values[0], ";", values[1],  ";", f"{ 'dec' if values[0] > values[1] else 'inc'}", ";", -(values[0] - values[1]) )
+
+    return chromeos_score, al_os_score
 
 
 compare_reports(chromeOS_report, AL_OS_report)

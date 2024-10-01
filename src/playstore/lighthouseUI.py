@@ -264,7 +264,7 @@ class LighthouseUI:
             sleep(2)
             # nput()
             self.click_desktop_device()
-            sleep(2)
+            sleep(1)
             self.__init = False # Deprecated...
             self.click_new_report() # Doesnt hurt to click after opening....
         else:
@@ -272,7 +272,7 @@ class LighthouseUI:
 
         # nput()
 
-        sleep(2)
+        sleep(1)
         # Check for errors first
         if self.is_img_showing("https_error.png"):
             print("Error loading page: need_https_showing")

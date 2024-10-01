@@ -5,7 +5,7 @@ from playstore.lighthouseUI import LighthouseUI
 from utils.utils import nput
 from utils.logging_utils import AppLogger
 
-from utils.app_utils import close_app, open_app
+from utils.utils import safe_find_element
 
 from appium.webdriver.common.appiumby import AppiumBy
 from selenium.common.exceptions import StaleElementReferenceException
@@ -49,25 +49,6 @@ def titleIsReady(expectedTitle):
         return ""
 
     return checkTitle
-
-def safe_find_element(driver, locator, retries=3):
-    """
-    Safely finds an element with retries in case of a StaleElementReferenceException.
-    """
-    for attempt in range(retries):
-        try:
-            # Wait for the element to be located
-            print(f"Looking for {locator=} {attempt=}")
-            element = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located(locator)
-            )
-            return element
-        except StaleElementReferenceException:
-            print(f"StaleElementReferenceException caught, retrying... ({attempt + 1}/{retries})")
-            if attempt == retries - 1:
-                raise  # Re-raise the exception if we've exhausted all retries
-
-
 
 
 @dataclass(order=True, unsafe_hash=True)

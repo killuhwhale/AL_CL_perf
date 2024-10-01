@@ -10,7 +10,9 @@ from datetime import datetime
 from enum import Enum
 from time import time
 from typing import AnyStr, Dict, List, Tuple, Union
-
+from selenium.common.exceptions import StaleElementReferenceException
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import __main__
 import cv2
 import numpy as np
@@ -24,6 +26,27 @@ def nput():
         if a == 'q':
             break
         a = ''
+
+def safe_find_element(driver, locator, retries=30):
+    """ 3 retries @ 10s wait or 30 retries @ 1 sec wait.... Same total wait time in worst case.
+    Safely finds an element with retries in case of a StaleElementReferenceException.
+    """
+    for attempt in range(retries):
+        try:
+            # Wait for the element to be located
+            print(f"Looking for {locator=} {attempt=}")
+            element = WebDriverWait(driver, 1).until(
+                EC.presence_of_element_located(locator)
+            )
+            return element
+        except StaleElementReferenceException:
+            print(f"StaleElementReferenceException caught, retrying... ({attempt + 1}/{retries})")
+            if attempt == retries - 1:
+                raise  # Re-raise the exception if we've exhausted all retries
+
+
+
+
 
 def users_home_dir():
     return os.path.expanduser( '~' )

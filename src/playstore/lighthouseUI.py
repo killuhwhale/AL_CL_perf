@@ -36,7 +36,7 @@ def find_in_screenshot(screenshot, template_path, threshold=0.8):
     loc = np.where(result >= threshold)
 
     if len(loc[0]) > 0:
-        print(f"found!")
+        # print(f"found!")
         # # Draw a rectangle around the found template in the screenshot (for visualization)
         # h, w, _ = template.shape
         # for pt in zip(*loc[::-1]):
@@ -46,7 +46,7 @@ def find_in_screenshot(screenshot, template_path, threshold=0.8):
 
         return True
     else:
-        print(f"not found.")
+        # print(f"not found.")
         # cv2.imshow('Failed to detect Cancel Button', screenshot)
         # cv2.waitKey(0)
         # cv2.destroyAllWindows()
@@ -125,12 +125,33 @@ class LighthouseUI:
         # Find the button in the screenshot
         return find_in_screenshot(screenshot, template_path)
 
+    def is_img_showing(self, filename, retries=3):
+        cur_dir = "/".join(os.path.abspath(__file__).split("/")[:-1])
+        template_path = f'{cur_dir}/{filename}'
 
-    def is_need_https_showing(self):
+        res = False
+        for _ in range(retries):
+            screenshot = capture_screenshot()
+            res = find_in_screenshot(screenshot, template_path)
+            retries -= 1
+            if res or retries < 0:
+                break
+            sleep(1)
+
+        print(f"{'Found' if res else 'Failed to find'}: {filename}")
+        return res
+
+
+
+
+
+
+    def is_need_https_showing(self,):
         current_file_path = os.path.abspath(__file__)
         cur_dir = "/".join(current_file_path.split("/")[:-1])
         template_path = f'{cur_dir}/https_error.png'  # Replace with your actual path
         # Capture the screenshot of the current screen
+
         screenshot = capture_screenshot()
         # Find the button in the screenshot
         return find_in_screenshot(screenshot, template_path)
@@ -213,14 +234,26 @@ class LighthouseUI:
             print(f"Error writing error json file for: {self.__url}", err)
 
 
+    def is_lh_panel_open(self):
+        '''
+            Check if we can see the lighthouse panel
+        '''
+        # TODO()
+        pass
+
 
     def start_analysis(self):
-        if self.__init:
-            # nput()
-            # Instead of a 3 clicker, sometimes that button isnt in same spot
-            # Lets do ctl + sht + p
-            # Typewrite: lighthouse + enter
-            sleep(2)
+        '''
+            1. Check if we have lighthouse panel open or not.
+              - Select an element in the page to inspect it - Ctrl + Shift + C
+        '''
+
+
+        # nput()
+
+        # if the add new report button is not showing, open panel..
+
+        if not self.is_img_showing("lighthouseText.png"):
             print("Pressing shortcut ctl+shift+p")
             pyautogui.hotkey('ctrl', 'shift', 'p')
             sleep(2)
@@ -232,16 +265,15 @@ class LighthouseUI:
             # nput()
             self.click_desktop_device()
             sleep(2)
-
-
-            self.__init = False
+            self.__init = False # Deprecated...
         else:
             self.click_new_report()
 
+        nput()
 
         sleep(2)
         # Check for errors first
-        if self.is_need_https_showing():
+        if self.is_img_showing("https_error.png"):
             print("Error loading page: need_https_showing")
             self.__download_failed_report()
             return False

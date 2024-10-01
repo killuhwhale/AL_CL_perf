@@ -12,7 +12,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from selenium.webdriver.support import expected_conditions as EC
 import time
-
+from utils.utils import safe_find_element
 
 
 pyautogui.FAILSAFE = False
@@ -67,12 +67,15 @@ class InspectAL:
 
     def open_inspector(self, package_name):
         # Open inspector
-        inspect_link = self.__driver.find_element(By.XPATH, self.inspect_link_pattern)
-        inspect_link.click()
-        self.__wait.until(EC.number_of_windows_to_be(2))
-        new_window_handle = self.__driver.window_handles[-1]
-        self.__driver.switch_to.window(new_window_handle)
-        self.__driver.maximize_window()
+        try:
+            inspect_link = safe_find_element(self.__driver, (By.XPATH, self.inspect_link_pattern))
+            inspect_link.click()
+            self.__wait.until(EC.number_of_windows_to_be(2))
+            new_window_handle = self.__driver.window_handles[-1]
+            self.__driver.switch_to.window(new_window_handle)
+            self.__driver.maximize_window()
+        except Exception as err:
+            print("Failed to open inpsector: ", err)
 
 
 

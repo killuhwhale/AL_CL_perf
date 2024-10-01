@@ -2,7 +2,7 @@ INFO:my_logger:CLI input: ips=['192.168.1.112:5555']
 
 INFO:my_logger:Config save_yolov8_predicts:True debug_print:True multi_split_packages:False login_facebook:False skip_pre_multi_uninstall:False skip_install:False skip_launch:False skip_login:True skip_post_uninstall:True base_url:https://appval-387223.wl.r.appspot.com 
 
-INFO:my_logger:run_id=UUID('c01607a7-7f75-11ef-802a-000000000539')
+INFO:my_logger:run_id=UUID('66819018-802d-11ef-802a-000000000539')
 
-INFO:my_logger:Start time ts=1727732918234
+INFO:my_logger:Start time ts=1727811795342
 

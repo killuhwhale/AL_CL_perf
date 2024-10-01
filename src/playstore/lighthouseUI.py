@@ -266,6 +266,7 @@ class LighthouseUI:
             self.click_desktop_device()
             sleep(2)
             self.__init = False # Deprecated...
+            self.click_new_report() # Doesnt hurt to click after opening....
         else:
             self.click_new_report()
 

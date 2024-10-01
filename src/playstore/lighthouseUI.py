@@ -270,7 +270,7 @@ class LighthouseUI:
         else:
             self.click_new_report()
 
-        nput()
+        # nput()
 
         sleep(2)
         # Check for errors first

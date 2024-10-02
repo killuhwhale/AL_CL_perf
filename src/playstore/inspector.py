@@ -92,8 +92,19 @@ class InspectAL:
         # Open inspector
         try:
             # self.click_inspect_for_site(package_name)
-            inspect_link = safe_find_element(self.__driver, (By.XPATH, self.inspect_link_pattern), retries=200)
-            inspect_link.click()
+            opened = False
+            attempts = 10
+            while not opened and attempts > 0:
+                try:
+                    inspect_link = safe_find_element(self.__driver, (By.XPATH, self.inspect_link_pattern), retries=200)
+                    inspect_link.click()
+                    opened = True
+                except Exception as err:
+                    print("failed to open inspector, retrying")
+                    attempts -= 1
+
+
+
             self.__wait.until(EC.number_of_windows_to_be(2))
             new_window_handle = self.__driver.window_handles[-1]
             self.__driver.switch_to.window(new_window_handle)

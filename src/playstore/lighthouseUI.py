@@ -174,61 +174,67 @@ class LighthouseUI:
         data = {
 
                 "error": f"Failed to load {self.__url}",
-                "metrics": {
-                    "audits": {
-                        "metrics": {
-                            "details": {
-                                'items': [
-                                    {
-                                        "firstContentfulPaint": 0,
-                                        "largestContentfulPaint": 0,
-                                        "interactive": 0,
-                                        "speedIndex": 0,
-                                        "totalBlockingTime": 0,
-                                        "maxPotentialFID": 0,
-                                        "cumulativeLayoutShift": 0,
-                                        "cumulativeLayoutShiftMainFrame": 0,
-                                        "lcpLoadStart": 0,
-                                        "lcpLoadEnd": 0,
-                                        "timeToFirstByte": 0,
-                                        "observedTimeOrigin": 0,
-                                        "observedTimeOriginTs": 0,
-                                        "observedNavigationStart": 0,
-                                        "observedNavigationStartTs": 0,
-                                        "observedFirstPaint": 0,
-                                        "observedFirstPaintTs": 0,
-                                        "observedFirstContentfulPaint": 0,
-                                        "observedFirstContentfulPaintTs": 0,
-                                        "observedFirstContentfulPaintAllFrames": 0,
-                                        "observedFirstContentfulPaintAllFramesTs": 0,
-                                        "observedLargestContentfulPaint": 0,
-                                        "observedLargestContentfulPaintTs": 0,
-                                        "observedLargestContentfulPaintAllFrames": 0,
-                                        "observedLargestContentfulPaintAllFramesTs": 0,
-                                        "observedTraceEnd": 0,
-                                        "observedTraceEndTs": 0,
-                                        "observedLoad": 0,
-                                        "observedLoadTs": 0,
-                                        "observedDomContentLoaded": 0,
-                                        "observedDomContentLoadedTs": 0,
-                                        "observedCumulativeLayoutShift": 0,
-                                        "observedCumulativeLayoutShiftMainFrame": 0,
-                                        "observedFirstVisualChange": 0,
-                                        "observedFirstVisualChangeTs": 0,
-                                        "observedLastVisualChange": 0,
-                                        "observedLastVisualChangeTs": 0,
-                                        "observedSpeedIndex": 0,
-                                        "observedSpeedIndexTs": 0
-                                    }
-                                ]
-                            }
+                "requestedUrl": f"{self.__url}",
+                "audits": {
+                    "metrics": {
+                        "errorMessage": f"Failed to load {self.__url}",
+                        "details": {
+                            'items': [
+                                {
+                                    "firstContentfulPaint": 0,
+                                    "largestContentfulPaint": 0,
+                                    "interactive": 0,
+                                    "speedIndex": 0,
+                                    "totalBlockingTime": 0,
+                                    "maxPotentialFID": 0,
+                                    "cumulativeLayoutShift": 0,
+                                    "cumulativeLayoutShiftMainFrame": 0,
+                                    "lcpLoadStart": 0,
+                                    "lcpLoadEnd": 0,
+                                    "timeToFirstByte": 0,
+                                    "observedTimeOrigin": 0,
+                                    "observedTimeOriginTs": 0,
+                                    "observedNavigationStart": 0,
+                                    "observedNavigationStartTs": 0,
+                                    "observedFirstPaint": 0,
+                                    "observedFirstPaintTs": 0,
+                                    "observedFirstContentfulPaint": 0,
+                                    "observedFirstContentfulPaintTs": 0,
+                                    "observedFirstContentfulPaintAllFrames": 0,
+                                    "observedFirstContentfulPaintAllFramesTs": 0,
+                                    "observedLargestContentfulPaint": 0,
+                                    "observedLargestContentfulPaintTs": 0,
+                                    "observedLargestContentfulPaintAllFrames": 0,
+                                    "observedLargestContentfulPaintAllFramesTs": 0,
+                                    "observedTraceEnd": 0,
+                                    "observedTraceEndTs": 0,
+                                    "observedLoad": 0,
+                                    "observedLoadTs": 0,
+                                    "observedDomContentLoaded": 0,
+                                    "observedDomContentLoadedTs": 0,
+                                    "observedCumulativeLayoutShift": 0,
+                                    "observedCumulativeLayoutShiftMainFrame": 0,
+                                    "observedFirstVisualChange": 0,
+                                    "observedFirstVisualChangeTs": 0,
+                                    "observedLastVisualChange": 0,
+                                    "observedLastVisualChangeTs": 0,
+                                    "observedSpeedIndex": 0,
+                                    "observedSpeedIndexTs": 0
+                                }
+                            ]
                         }
                     }
-
                 }
+
+
             }
         try:
-            with open(f"{self.__url}-{datetime.now()}", 'w', 'utf-8') as f:
+            download_dir = f"{os.path.expanduser( '~' )}/Downloads"
+            url = self.__url
+            url = url.replace("https://", '')
+            url = url.replace("http://", '')
+
+            with open(f"{download_dir}/{url}-{datetime.now().strftime('%Y%m%dT%H%M%S')}.json", 'w', encoding='utf-8') as f:
                 json.dump(data, f)
         except Exception as err:
             print(f"Error writing error json file for: {self.__url}", err)

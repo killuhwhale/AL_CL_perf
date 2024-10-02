@@ -86,6 +86,7 @@
 
 import collections
 import json
+import os
 from typing import List
 
 
@@ -124,9 +125,9 @@ AL_OS_report = get_report(fp2)
 
 def get_file_names(dir):
     '''
-        Get All report filenames from a DIR and split is they end with _chromeos.json
+        Get All report filenames from a DIR and split if they end with _chromeos.json
     '''
-    fns = []  # TODO() Read all file names from dir
+    fns = os.listdir("TODO()")
     chromeos_fns = []
     al_os_fns = []
     suffix = "_chromeos.json"

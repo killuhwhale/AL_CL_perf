@@ -25,3 +25,4 @@ src/images/history/*
 runs/*
 src/notebooks/.ipynb_checkpoints/*
 etc/*
+src/crash.log

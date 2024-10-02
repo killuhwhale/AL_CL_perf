@@ -90,11 +90,14 @@ import os
 from typing import List
 
 
+'''
+Compares Lighthouse reports from AL OS and Classic
+'''
+
 fp1 = "/home/killuh/Downloads/www.youtube.com-20240924T230012.json"
 fp2 = "/home/killuh/Downloads/www.facebook.com-20240924T225052.json"
 
 ERROR_500 = "Lighthouse was unable to reliably load the page you requested. Make sure you are testing the correct URL and that the server is properly responding to all requests. (Status code: 500)"
-
 ERRORS = [ERROR_500, ]
 
 def get_report(fp):
@@ -103,8 +106,7 @@ def get_report(fp):
         r = json.load(f)
         print(r.keys())
 
-
-
+    # TODO() Error message errorMessage check: r['audits']['metrics']['errorMessage']
     report = {
         "error": r['runWarnings'] in ERRORS,
         "metrics": r['audits']['metrics']['details']['items'][0] if r else {}
@@ -127,7 +129,9 @@ def get_file_names(dir):
     '''
         Get All report filenames from a DIR and split if they end with _chromeos.json
     '''
-    fns = os.listdir("TODO()")
+
+    # TODO()
+    fns = os.listdir(f"{os.path.expanduser("~")}/TODO()")
     chromeos_fns = []
     al_os_fns = []
     suffix = "_chromeos.json"

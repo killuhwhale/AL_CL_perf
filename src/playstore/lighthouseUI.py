@@ -228,7 +228,7 @@ class LighthouseUI:
                 }
             }
         try:
-            with open(f"{self.__url}"-{datetime.now()}, 'w', 'utf-8') as f:
+            with open(f"{self.__url}-{datetime.now()}", 'w', 'utf-8') as f:
                 json.dump(data, f)
         except Exception as err:
             print(f"Error writing error json file for: {self.__url}", err)
@@ -240,6 +240,19 @@ class LighthouseUI:
         '''
         # TODO()
         pass
+
+
+
+    def open_lh_panel(self):
+        print("Pressing shortcut ctl+shift+p")
+        pyautogui.hotkey('ctrl', 'shift', 'p')
+        sleep(2)
+        self.keyboard.type("lighthouse")
+        sleep(1)
+        self.keyboard.press(Key.enter)
+        self.keyboard.release(Key.enter)
+        sleep(2)
+        self.click_desktop_device()
 
 
     def start_analysis(self):
@@ -254,23 +267,13 @@ class LighthouseUI:
         # if the add new report button is not showing, open panel..
 
         if not self.is_img_showing("lighthouseText.png"):
-            print("Pressing shortcut ctl+shift+p")
-            pyautogui.hotkey('ctrl', 'shift', 'p')
+            self.open_lh_panel()
             sleep(2)
-            self.keyboard.type("lighthouse")
-            sleep(1)
-            self.keyboard.press(Key.enter)
-            self.keyboard.release(Key.enter)
-            sleep(2)
-            # nput()
-            self.click_desktop_device()
-            sleep(2)
-            self.__init = False # Deprecated...
             self.click_new_report() # Doesnt hurt to click after opening....
         else:
             self.click_new_report()
 
-        nput()
+        # nput()
 
         sleep(2)
         # Check for errors first
@@ -286,6 +289,12 @@ class LighthouseUI:
         while self.is_cancel_btn_showing():
             sleep(3)
 
+        # On captcha pages, the last reload places the inspector panel back to inpect, need to go back to lighthouse tab
+        sleep(2)
+
+        if not self.is_img_showing("lighthouseText.png"):
+            self.open_lh_panel()
+
         sleep(1)
         self.click_download_menu()
         sleep(2)
@@ -294,8 +303,5 @@ class LighthouseUI:
         self.click_save()
         sleep(2)
         return True
-
-
-
 
 

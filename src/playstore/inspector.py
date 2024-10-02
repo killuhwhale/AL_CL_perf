@@ -12,7 +12,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from selenium.webdriver.support import expected_conditions as EC
 import time
-from utils.utils import safe_find_element
+from utils.utils import safe_find_element, nput
 
 
 pyautogui.FAILSAFE = False
@@ -65,10 +65,34 @@ class InspectAL:
         time.sleep(3) # Wait for devices to appear
 
 
+    def click_inspect_for_site(self, site_name):
+        try:
+            # Find all subrow-box elements
+            subrows = self.__driver.find_elements(By.CSS_SELECTOR, "div.subrow-box")
+
+            # Iterate through each subrow-box
+            for subrow in subrows:
+                # Find the site name within this subrow
+                name_element = subrow.find_element(By.CSS_SELECTOR, "div.name")
+                if name_element.text == site_name:
+                    # If the site name matches, find the 'inspect' link within the same subrow
+                    inspect_link = subrow.find_element(By.CSS_SELECTOR, "span.action")
+                    if 'inspect' in inspect_link.text.lower():
+                        inspect_link.click()
+                        print(f"Clicked 'inspect' for {site_name}")
+                        return
+
+            print(f"Site name {site_name} not found")
+
+        except Exception as e:
+            print(f"Failed to click 'inspect' for {site_name}: {e}")
+
+
     def open_inspector(self, package_name):
         # Open inspector
         try:
-            inspect_link = safe_find_element(self.__driver, (By.XPATH, self.inspect_link_pattern))
+            # self.click_inspect_for_site(package_name)
+            inspect_link = safe_find_element(self.__driver, (By.XPATH, self.inspect_link_pattern), retries=200)
             inspect_link.click()
             self.__wait.until(EC.number_of_windows_to_be(2))
             new_window_handle = self.__driver.window_handles[-1]

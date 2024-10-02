@@ -142,10 +142,6 @@ class LighthouseUI:
         return res
 
 
-
-
-
-
     def is_need_https_showing(self,):
         current_file_path = os.path.abspath(__file__)
         cur_dir = "/".join(current_file_path.split("/")[:-1])
@@ -240,15 +236,6 @@ class LighthouseUI:
             print(f"Error writing error json file for: {self.__url}", err)
 
 
-    def is_lh_panel_open(self):
-        '''
-            Check if we can see the lighthouse panel
-        '''
-        # TODO()
-        pass
-
-
-
     def open_lh_panel(self):
         print("Pressing shortcut ctl+shift+p")
         pyautogui.hotkey('ctrl', 'shift', 'p')
@@ -257,8 +244,8 @@ class LighthouseUI:
         sleep(1)
         self.keyboard.press(Key.enter)
         self.keyboard.release(Key.enter)
-        sleep(2)
-        self.click_desktop_device()
+
+
 
 
     def start_analysis(self):
@@ -273,7 +260,10 @@ class LighthouseUI:
         # if the add new report button is not showing, open panel..
 
         if not self.is_img_showing("lighthouseText.png"):
+            sleep(1)
             self.open_lh_panel()
+            sleep(2)
+            self.click_desktop_device()
             sleep(2)
             self.click_new_report() # Doesnt hurt to click after opening....
         else:

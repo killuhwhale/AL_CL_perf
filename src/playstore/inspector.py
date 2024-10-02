@@ -96,7 +96,7 @@ class InspectAL:
             attempts = 10
             while not opened and attempts > 0:
                 try:
-                    inspect_link = safe_find_element(self.__driver, (By.XPATH, self.inspect_link_pattern), retries=200)
+                    inspect_link = safe_find_element(self.__driver, (By.XPATH, self.inspect_link_pattern))
                     inspect_link.click()
                     opened = True
                 except Exception as err:

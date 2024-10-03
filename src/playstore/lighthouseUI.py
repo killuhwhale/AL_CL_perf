@@ -171,6 +171,7 @@ class LighthouseUI:
 
                 "error": f"Failed to load {self.__url}",
                 "requestedUrl": f"{self.__url}",
+                "runWarnings": [""],
                 "audits": {
                     "metrics": {
                         "errorMessage": f"Failed to load {self.__url}",

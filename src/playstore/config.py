@@ -12,7 +12,7 @@ def get_save_coords():
     SAVE_BTN_COORDS = (2013, 354,)
     if user == "killuh":
         # Personal
-        SAVE_BTN_COORDS = (2013, 354,)
+        SAVE_BTN_COORDS = (1853, 356,)
     elif user == "appval002":
         # AMD Linux Laptop RED
         SAVE_BTN_COORDS = (1867, 300,)
@@ -22,7 +22,7 @@ def get_save_coords():
 
 def get_coords():
     return {
-        "click_desktop_device": (2305, 483,),
+        "click_desktop_device": (2305, 476,),
 
         "click_metric_a11y": (2306, 568,),
         "click_metric_bpractices": (2306, 593,),

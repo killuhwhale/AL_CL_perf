@@ -59,6 +59,7 @@ class LighthouseUI:
     keyboard = Controller()
     __url = ""
     __coords = get_coords()
+    __first_analysis = True
 
     def setURL(self, url):
         self.__url = url
@@ -72,40 +73,38 @@ class LighthouseUI:
         pyautogui.moveTo(x, y + SCREEN_TOP_MARGIN + WINDOW_TOP_MARGIN, duration=gauss(0.4, .1))
         pyautogui.click()
 
+    def __click_name(self, name=None):
+        if name is None:
+            return
+        print(f"Clicking {name}", end=" -> ")
+        self.__click(self.__coords[name])
+
 
     def click_desktop_device(self):
-        pt = self.__coords["click_desktop_device"]
-        self.__click(pt)
+        self.__click_name("click_desktop_device")
+
 
     def click_metrics(self):
         # Selects the metrics we want in the report
-        pt = self.__coords["click_metric_a11y"]
-        self.__click(pt)
-        pt = self.__coords["click_metric_bpractices"]
-        self.__click(pt)
-        pt = self.__coords["click_metric_seo"]
-        self.__click(pt)
+        self.__click_name("click_metric_a11y")
+        self.__click_name("click_metric_bpractices")
+        self.__click_name("click_metric_seo")
 
 
     def click_analyze_page_load(self):
-        pt = self.__coords["click_analyze_page_load"]
-        self.__click(pt)
+        self.__click_name("click_analyze_page_load")
 
     def click_download_menu(self):
-        pt = self.__coords["click_download_menu"]
-        self.__click(pt)
+        self.__click_name("click_download_menu")
 
     def click_download(self):
-        pt = self.__coords["click_download"]
-        self.__click(pt)
+        self.__click_name("click_download")
 
     def click_save(self):
-        pt = self.__coords["click_save"]
-        self.__click(pt)
+        self.__click_name("click_save")
 
     def click_new_report(self):
-        pt = self.__coords["click_new_report"]
-        self.__click(pt)
+        self.__click_name("click_new_report")
 
 
     def is_cancel_btn_showing(self):
@@ -246,33 +245,36 @@ class LighthouseUI:
 
 
 
+    def setup_lh(self):
+
+        if not self.is_img_showing("initNewReportIcon.png"):
+            while not self.is_img_showing("initNewReportIcon.png"):
+                sleep(1)
+                self.open_lh_panel()
+                sleep(2)
+
+            self.click_desktop_device()
+            if self.__first_analysis:
+                self.__first_analysis = False
+                self.click_metrics()
+            sleep(2)
+            self.click_new_report() # Doesnt hurt to click after opening....
+
+    def reset_lh_panel_after_report(self):
+        if self.is_img_showing("newReportIcon.png"):
+            self.click_new_report() # Doesnt hurt to click after opening....
+
 
     def start_analysis(self):
         '''
             1. Check if we have lighthouse panel open or not.
               - Select an element in the page to inspect it - Ctrl + Shift + C
         '''
-
-
-        # nput()
-
-        # if the add new report button is not showing, open panel..
-
-        if not self.is_img_showing("lighthouseText.png"):
-            while not self.is_img_showing("lighthouseText.png"):
-                sleep(1)
-                self.open_lh_panel()
-                sleep(2)
-
-            self.click_desktop_device()
-            sleep(2)
-            self.click_metrics()
-            sleep(2)
-            self.click_new_report() # Doesnt hurt to click after opening....
-        else:
-            self.click_new_report()
-
-        # nput()
+        print("starting analysis")
+        # Lighthouse panel should either be on the inpsector table intiaially,
+        # or it should be on the lighthouse panel after a report and then we should reset it...
+        self.setup_lh()
+        self.click_new_report()
 
         sleep(2)
         # Check for errors first
@@ -290,17 +292,16 @@ class LighthouseUI:
 
         # On captcha pages, the last reload places the inspector panel back to inpect, need to go back to lighthouse tab
         sleep(2)
-
-        if not self.is_img_showing("lighthouseText.png"):
-            self.open_lh_panel()
-
-        sleep(1)
         self.click_download_menu()
         sleep(2)
         self.click_download()
         sleep(2)
         self.click_save()
         sleep(2)
+
+
+        self.reset_lh_panel_after_report()
+
         return True
 
 

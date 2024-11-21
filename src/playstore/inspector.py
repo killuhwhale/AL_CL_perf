@@ -91,6 +91,7 @@ class InspectAL:
 
     def open_inspector(self, package_name):
         # Open inspector
+        print("opening inspector")
         try:
             # self.click_inspect_for_site(package_name)
             opened = False

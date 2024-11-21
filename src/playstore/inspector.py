@@ -48,7 +48,7 @@ class InspectAL:
     def open_devices(self):
         chrome_options = Options()
         chrome_service = Service()
-        chrome_options.binary_location = f"/home/{os.getenv("USER")}/Downloads/chrome-linux64/chrome"
+        chrome_options.binary_location = f"/home/{os.getenv('USER')}/Downloads/chrome-linux64/chrome"
         self.__driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
         self.__driver.get("chrome://inspect/#devices")
 

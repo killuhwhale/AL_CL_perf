@@ -16,3 +16,15 @@ def get_save_coords():
         # AMD Linux Laptop RED
         SAVE_BTN_COORDS = (1867, 300,)
     return SAVE_BTN_COORDS
+
+
+
+def get_coords():
+    return {
+        "click_desktop_device": (2305, 483,),
+        "click_analyze_page_load": (2414, 259,),
+        "click_download_menu": (2527, 182,),
+        "click_download": (2465, 351,),
+        "click_save": (2006, 351,),
+        "click_new_report": (2278, 147,),
+    }

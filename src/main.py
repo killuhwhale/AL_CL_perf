@@ -66,7 +66,7 @@ def main():
 
 
     print("Creating driver...")
-    PACKAGE = "com.android.chrome"
+    PACKAGE = "com.chrome.canary"
     ACTIVITY = "com.google.android.apps.chrome.Main"
     try:
 
@@ -92,7 +92,8 @@ def main():
         print("Starting validator!")
         validator = AppValidator(
             driver,
-            None
+            None,
+            chrome_channel="com.chrome.canary",
         )
         validator.run()
     except Exception as err:

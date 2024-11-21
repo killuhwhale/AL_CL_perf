@@ -71,6 +71,7 @@ class AppValidator:
             self,
             driver: Remote,
             app_logger: AppLogger,
+            chrome_channel: str="com.android.chrome",
         ):
         self.__driver = driver
         self.__app_logger = app_logger
@@ -80,6 +81,7 @@ class AppValidator:
         self.__init_check_site = True
         self.__lh = LighthouseUI()
         self.__failed_urls = []
+        self.__chrome_channel = chrome_channel
 
     def __print_stats(self):
 
@@ -96,16 +98,16 @@ class AppValidator:
 
         # The button to access the tab overview can be located by its content description
         try:
-            tab_menu = safe_find_element(self.__driver, (AppiumBy.ACCESSIBILITY_ID, "Switch or close tabs"))
-            tab_menu.click()
+            new_tab_btn = safe_find_element(self.__driver, (AppiumBy.ID, f"{self.__chrome_channel}:id/tab_switcher_button"))
+            new_tab_btn.click()
 
-            chrome_menu = safe_find_element(self.__driver, (AppiumBy.ACCESSIBILITY_ID, "Customize and control Google Chrome"))
+            chrome_menu = safe_find_element(self.__driver, (AppiumBy.ID, f"{self.__chrome_channel}:id/menu_button"))
             chrome_menu.click()
 
-            close_all_item = safe_find_element(self.__driver, (AppiumBy.ID, "com.android.chrome:id/close_all_tabs_menu_id"))
+            close_all_item = safe_find_element(self.__driver, (AppiumBy.ID, f"{self.__chrome_channel}:id/close_all_tabs_menu_id"))
             close_all_item.click()
 
-            confirm_btn = safe_find_element(self.__driver, (AppiumBy.ID, "com.android.chrome:id/positive_button"))
+            confirm_btn = safe_find_element(self.__driver, (AppiumBy.ID, f"{self.__chrome_channel}:id/positive_button"))
             confirm_btn.click()
 
 
@@ -113,28 +115,51 @@ class AppValidator:
             # close_button = self.__driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR, '''new UiSelector().descriptionMatches(\"^Close.*\")''')
         except Exception as err:
             print("Unable to open tab overview: ", err)
-            return
+
+        print("Done closing tabs")
+
+    def __pixel_continue_dialog(self):
+        '''
+          On Google Pixel Tablet there is always dialog that pops up to continue as user X
+        '''
+        try:
+            cont = safe_find_element(self.__driver, (AppiumBy.ID, f"{self.__chrome_channel}:id/signin_fre_continue_button")) # Continue as userX
+            cont.click()
+
+            no_thanks = safe_find_element(self.__driver, (AppiumBy.ID, f"{self.__chrome_channel}:id/button_secondary")) # no thanks
+            no_thanks.click()
+
+            got_it = safe_find_element(self.__driver, (AppiumBy.ID, f"{self.__chrome_channel}:id/ack_button")) # ack btn
+            got_it.click()
+
+            no_thanks_notification = safe_find_element(self.__driver, (AppiumBy.ID, f"{self.__chrome_channel}:id/negative_button")) # Notifications no thanks
+            no_thanks_notification.click()
+        except Exception as err:
+            print("No continue dialog found", err)
 
 
     def __check_site(self, url) -> float:
+
+
         try:
             if self.__init_check_site:
                 self.__closeTabs()
                 self.__init_check_site = False
                 # id: com.android.chrome:id/toolbar_action_button
-                home_btn = safe_find_element(self.__driver, (AppiumBy.ACCESSIBILITY_ID, "New tab"))
-                home_btn.click()
+                # tab_switcher_button
+                new_tab_btn = safe_find_element(self.__driver, (AppiumBy.ID, f"{self.__chrome_channel}:id/toolbar_action_button"))
+                new_tab_btn.click()
                 time.sleep(3)
 
 
             time.sleep(3)
             print("Opening site: ", url)
-            # com.android.chrome:id/url_bar
             try:
-                url_bar = safe_find_element(self.__driver, (AppiumBy.ID, "com.android.chrome:id/url_bar"))
+                url_bar = safe_find_element(self.__driver, (AppiumBy.ID, f"{self.__chrome_channel}:id/url_bar"))
                 url_bar.click()
                 url_bar.send_keys(url)
                 self.__driver.press_keycode(66)
+                nput()
             except Exception as err:
                 print("Error entering new url: ", err)
 
@@ -204,6 +229,7 @@ class AppValidator:
 
 
 
+
         print("Done testing on browser!")
 
     def __read_apps(self):
@@ -232,6 +258,7 @@ class AppValidator:
 
         # Load devices before navigating to website
         inspector.open_devices()
+        self.__pixel_continue_dialog() # For pixel Tablet
         print("Done openings device tab...")
 
         app_names = self.__read_apps()

@@ -10,7 +10,7 @@ import cv2
 import numpy as np
 import pyautogui
 from pynput.keyboard import Controller, Key
-from playstore.config import get_save_coords
+from playstore.config import get_save_coords, get_coords
 
 SCREEN_TOP_MARGIN = 28
 WINDOW_TOP_MARGIN = 35
@@ -61,6 +61,7 @@ class LighthouseUI:
     keyboard = Controller()
     __save_coords = get_save_coords()
     __url = ""
+    __coords = get_coords()
 
 
     def setURL(self, url):
@@ -77,37 +78,28 @@ class LighthouseUI:
         pyautogui.click()
 
 
-    def click_menu(self):
-        pt = (2481, 67,)
-        self.__click(pt)
-
-
-    def click_lighthouse(self):
-        pt = (2342, 287,)
-        self.__click(pt)
-
-
     def click_desktop_device(self):
-        pt = (2306, 430,)
+        pt = self.__coords["click_desktop_device"]
         self.__click(pt)
 
     def click_analyze_page_load(self):
-        pt = (2418, 205,)
+        pt = self.__coords["click_analyze_page_load"]
         self.__click(pt)
 
     def click_download_menu(self):
-        pt = (2534, 125,)
+        pt = self.__coords["click_download_menu"]
         self.__click(pt)
 
     def click_download(self):
-        pt = (2463, 297,)
+        pt = self.__coords["click_download"]
         self.__click(pt)
 
     def click_save(self):
-        self.__click(self.__save_coords)
+        pt = self.__coords["click_save"]
+        self.__click(pt)
 
     def click_new_report(self):
-        pt = (2280, 95,)
+        pt = self.__coords["click_new_report"]
         self.__click(pt)
 
 

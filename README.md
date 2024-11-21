@@ -4,6 +4,9 @@ Appium-Python-Client==2.6.0
 selenium==4.6.0
 
 
+## ChromeDriver
+https://storage.googleapis.com/chrome-for-testing-public/133.0.6835.3/linux64/chromedriver-linux64.zip
+
 ## Process to get performance comparisons AL_OS:
 1. Run python3 src/main.py -i 192.168.1.112:5555
 2. Collect Reports from Downloads

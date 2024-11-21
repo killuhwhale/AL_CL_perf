@@ -55,18 +55,13 @@ def find_in_screenshot(screenshot, template_path, threshold=0.8):
 
 @dataclass
 class LighthouseUI:
-
     # This class will Click on the light house download buttons
-    __init = True
     keyboard = Controller()
-    __save_coords = get_save_coords()
     __url = ""
     __coords = get_coords()
 
-
     def setURL(self, url):
         self.__url = url
-
 
     def __click(self, pt=None):
         if pt is None:
@@ -81,6 +76,16 @@ class LighthouseUI:
     def click_desktop_device(self):
         pt = self.__coords["click_desktop_device"]
         self.__click(pt)
+
+    def click_metrics(self):
+        # Selects the metrics we want in the report
+        pt = self.__coords["click_metric_a11y"]
+        self.__click(pt)
+        pt = self.__coords["click_metric_bpractices"]
+        self.__click(pt)
+        pt = self.__coords["click_metric_seo"]
+        self.__click(pt)
+
 
     def click_analyze_page_load(self):
         pt = self.__coords["click_analyze_page_load"]
@@ -131,6 +136,7 @@ class LighthouseUI:
             sleep(1)
 
         print(f"{'Found' if res else 'Failed to find'}: {filename}")
+
         return res
 
 
@@ -253,10 +259,14 @@ class LighthouseUI:
         # if the add new report button is not showing, open panel..
 
         if not self.is_img_showing("lighthouseText.png"):
-            sleep(1)
-            self.open_lh_panel()
-            sleep(2)
+            while not self.is_img_showing("lighthouseText.png"):
+                sleep(1)
+                self.open_lh_panel()
+                sleep(2)
+
             self.click_desktop_device()
+            sleep(2)
+            self.click_metrics()
             sleep(2)
             self.click_new_report() # Doesnt hurt to click after opening....
         else:

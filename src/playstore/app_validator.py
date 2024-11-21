@@ -159,7 +159,7 @@ class AppValidator:
                 url_bar.click()
                 url_bar.send_keys(url)
                 self.__driver.press_keycode(66)
-                nput()
+
             except Exception as err:
                 print("Error entering new url: ", err)
 
